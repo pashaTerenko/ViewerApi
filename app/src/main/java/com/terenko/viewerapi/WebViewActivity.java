@@ -17,9 +17,8 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 public class WebViewActivity extends MainActivity {
-    private static final String EXTRA_DATE_PAYLOAD = "TextViewActivity.EXTRA_DATE_PAYLOAD";
-    private static final String EXTRA_DATE_ID = "TextViewActivity.EXTRA_DATE_ID";
-    public static Intent start(Context caller, String text,String acurrentPost) {
+
+    public static Intent start(Context caller, String text, String acurrentPost) {
         Intent intent = new Intent(caller, WebViewActivity.class);
         intent.putExtra(EXTRA_DATE_PAYLOAD, text);
 
@@ -27,7 +26,9 @@ public class WebViewActivity extends MainActivity {
         caller.startActivity(intent);
         return intent;
     }
+
     WebView webView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,12 +52,9 @@ public class WebViewActivity extends MainActivity {
 
 
     }
-    @Override
-    public void loadPost() {
-        if(!(getIntent().getStringExtra(EXTRA_DATE_ID).equals(app.getCurrentPost())))
-            super.loadPost();
 
-    }
+
+
     private class WebViewClientImpl extends WebViewClient {
 
         private Activity activity = null;

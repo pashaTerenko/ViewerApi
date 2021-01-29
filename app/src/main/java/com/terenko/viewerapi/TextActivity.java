@@ -6,8 +6,7 @@ import android.os.Bundle;
 import android.widget.TextView;
 
 public class TextActivity extends MainActivity {
-    private static final String EXTRA_DATE_PAYLOAD = "TextViewActivity.EXTRA_DATE_PAYLOAD";
-    private static final String EXTRA_DATE_ID = "TextViewActivity.EXTRA_DATE_ID";
+
     public static Intent start(Context caller, String text,String acurrentPost) {
         Intent intent = new Intent(caller, TextActivity.class);
         intent.putExtra(EXTRA_DATE_PAYLOAD, text);

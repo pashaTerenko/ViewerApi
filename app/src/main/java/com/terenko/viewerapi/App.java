@@ -64,4 +64,38 @@ public class App extends Application {
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
+    public void refreshPosts() {
+        if (isNetworkAvailable()) {
+            getApiService().getApi().getPostId().enqueue(new Callback<List<String>>() {
+                @Override
+                public void onResponse(Call<List<String>> call, Response<List<String>> response) {
+                    refresh(response.body());
+
+                }
+
+                @Override
+                public void onFailure(Call<List<String>> call, Throwable t) {
+                    t.printStackTrace();
+                }
+            });
+        }
+    }
+
+    public void refreshPostsAndReload(MainActivity activity) {
+        if (isNetworkAvailable()) {
+            getApiService().getApi().getPostId().enqueue(new Callback<List<String>>() {
+                @Override
+                public void onResponse(Call<List<String>> call, Response<List<String>> response) {
+                    refresh(response.body());
+                   activity.loadPost();
+                }
+
+                @Override
+                public void onFailure(Call<List<String>> call, Throwable t) {
+                    t.printStackTrace();
+                }
+            });
+        }
+    }
+
 }

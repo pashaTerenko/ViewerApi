@@ -8,13 +8,10 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.Window;
 
-import com.terenko.viewerapi.API.ApiService;
 import com.terenko.viewerapi.API.Responce;
 
-import java.util.ArrayList;
+
 import java.util.List;
 
 import retrofit2.Call;
@@ -34,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
         app = (App) getApplication();
 
         if (this.getClass() == MainActivity.class)
-            refreshPostsAndReload();
+            app.refreshPostsAndReload(this);
         else {
             app.setCurrentPost(getIntent().getStringExtra(EXTRA_DATE_ID));
         }
@@ -75,35 +72,6 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-   /* public void setListener() {
-        findViewById(R.id.next).setOnClickListener(v -> {
-            app.nextPost();
-            loadPost();
-        });
-        findViewById(R.id.prev).setOnClickListener(v -> {
-            app.prevPost();
-            loadPost();
-        });
-    }*/
-
-    /* public void swipeListener() {
-
-                 getActionBarView().setOnTouchListener(new OnSwipeTouchListener(this) {
-             @Override
-             public void onSwipeLeft() {
-
-                 app.nextPost();
-                 loadPost();
-             }
-
-             @Override
-             public void onSwipeRight() {
-                 app.prevPost();
-                 loadPost();
-             }
-         });
-     }
- */
     public void callText(String payload) {
         TextActivity.start(this, payload,app.getCurrentPost());
     }
@@ -147,39 +115,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void refreshPosts() {
-        if (app.isNetworkAvailable()) {
-            app.getApiService().getApi().getPostId().enqueue(new Callback<List<String>>() {
-                @Override
-                public void onResponse(Call<List<String>> call, Response<List<String>> response) {
-                    app.refresh(response.body());
 
-                }
-
-                @Override
-                public void onFailure(Call<List<String>> call, Throwable t) {
-                    t.printStackTrace();
-                }
-            });
-        }
-    }
-
-    public void refreshPostsAndReload() {
-        if (app.isNetworkAvailable()) {
-            app.getApiService().getApi().getPostId().enqueue(new Callback<List<String>>() {
-                @Override
-                public void onResponse(Call<List<String>> call, Response<List<String>> response) {
-                    app.refresh(response.body());
-                    loadPost();
-                }
-
-                @Override
-                public void onFailure(Call<List<String>> call, Throwable t) {
-                    t.printStackTrace();
-                }
-            });
-        }
-    }
 
 
 }
