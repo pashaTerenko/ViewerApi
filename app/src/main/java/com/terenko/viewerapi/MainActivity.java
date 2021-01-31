@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
         getSupportActionBar().setTitle(getString(R.string.swipezone));
         app = (App) getApplication();
@@ -73,12 +74,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void callText(String payload) {
-        TextActivity.start(this, payload,app.getCurrentPost());
+                TextActivity.start(this, payload,app.getCurrentPost());
+
     }
 
     public void callWeb(String payload) {
 
         WebViewActivity.start(this, payload,app.getCurrentPost());
+
     }
 
     public void loadPost() {

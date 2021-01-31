@@ -7,13 +7,13 @@ import android.widget.TextView;
 
 public class TextActivity extends MainActivity {
 
-    public static Intent start(Context caller, String text,String acurrentPost) {
+    public static void start(Context caller, String text,String acurrentPost) {
         Intent intent = new Intent(caller, TextActivity.class);
         intent.putExtra(EXTRA_DATE_PAYLOAD, text);
 
         intent.putExtra(EXTRA_DATE_ID, acurrentPost);
         caller.startActivity(intent);
-        return intent;
+
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
