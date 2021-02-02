@@ -2,50 +2,45 @@ package com.terenko.viewerapi;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ProgressBar;
+
+import androidx.fragment.app.*;
 
 import com.terenko.viewerapi.API.Responce;
+import com.terenko.viewerapi.Fragments.FragmentText;
+import com.terenko.viewerapi.Fragments.FragmentWeb;
 
-
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
-    protected static final String EXTRA_DATE_PAYLOAD = "TextViewActivity.EXTRA_DATE_PAYLOAD";
-    protected static final String EXTRA_DATE_ID = "TextViewActivity.EXTRA_DATE_ID";
     App app;
-
+    String postID;
+    ProgressBar loadingProgressBar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main);
-        getSupportActionBar().setTitle(getString(R.string.swipezone));
+        loadingProgressBar = findViewById(R.id.loading);
         app = (App) getApplication();
 
-        if (this.getClass() == MainActivity.class)
-            app.refreshPostsAndReload(this);
-        else {
-            app.setCurrentPost(getIntent().getStringExtra(EXTRA_DATE_ID));
-        }
+        app.refreshPostsAndReload(this);
+
+
     }
 
     @Override
     protected void onPostResume() {
         super.onPostResume();
-        if (!(this.getClass() == MainActivity.class))
-
-            app.setCurrentPost(getIntent().getStringExtra(EXTRA_DATE_ID));
-        }
-
+    }
 
 
     @Override
@@ -59,55 +54,63 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.next:
+
                 app.nextPost();
                 loadPost();
                 return false;
             case R.id.prev:
+
                 app.prevPost();
                 loadPost();
                 return false;
 
-                // Respond to the action bar's Up/Home button
+            // Respond to the action bar's Up/Home button
 
         }
         return super.onOptionsItemSelected(item);
     }
 
-    public void callText(String payload) {
-                TextActivity.start(this, payload,app.getCurrentPost());
+    //для  других типов данных  создаем фрагмент и добавляем тип в setView
+    public void setView(Responce data) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        for (Fragment fragment : fragmentManager.getFragments()) {
+            fragmentManager.beginTransaction().remove(fragment).commit();
+        }
+        switch (data.getType()) {
+            case "text": {
+                FragmentText fragment = FragmentText.newInstance(data.getPayload());
+                fragmentManager.beginTransaction().add(R.id.linearLayout,  fragment).commit();
+                break;
+            }
+            case "webpage": {
+                Fragment fragment = FragmentWeb.newInstance(data.getPayload());
+                fragmentManager.beginTransaction().add(R.id.linearLayout,  fragment).commit();
 
-    }
 
-    public void callWeb(String payload) {
+                break;
+            }
+        }
 
-        WebViewActivity.start(this, payload,app.getCurrentPost());
 
     }
 
     public void loadPost() {
-        try {
-            if((getIntent().getStringExtra(EXTRA_DATE_ID).equals(app.getCurrentPost())))
-                return;
-        } catch (NullPointerException e) {
 
-        }
-        String id = app.getCurrentPost();
-        app.getApiService().getApi().getPost(id).enqueue(new Callback<Responce>() {
+        postID = app.getCurrentPostID();
+        app.getApiService().getApi().getPost(postID).enqueue(new Callback<Responce>() {
             @Override
             public void onResponse(Call<Responce> call, Response<Responce> response) {
                 Responce post = response.body();
-                switch (post.getType()) {
-                    case "text": {
-                        callText(post.getPayload().getText());
-                        break;
-                    }
-
-                    case "webpage": {
-                        callWeb(post.getPayload().getUrl());
-
-                        break;
-                    }
-
+                if (post == null) {
+                    loadingProgressBar.setVisibility(View.VISIBLE);
+                    Handler handler = new Handler(Looper.getMainLooper());
+                    handler.postDelayed(() -> {
+                        loadingProgressBar.setVisibility(View.GONE);
+                        loadPost();
+                    }, 50000);
+                }else {
+                    setView(post);
+                    getSupportActionBar().setTitle(app.getActionBarString());
                 }
             }
 
@@ -117,8 +120,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
-
 
 
 }
